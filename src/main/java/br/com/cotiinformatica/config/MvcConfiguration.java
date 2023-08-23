@@ -1,13 +1,19 @@
 package br.com.cotiinformatica.config;
 
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import br.com.cotiinformatica.repositories.ContaRepository;
+import br.com.cotiinformatica.repositories.UsuarioRepository;
 
 @Configuration
 @ComponentScan(basePackages="br.com.cotiinformatica")
@@ -28,4 +34,39 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter{
 	}
 
 	
+	//adicionando a configuração para conexão
+	// com o banco de dados do projeto (DATA Source)
+
+	public DataSource getDataSource() {
+	
+	DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	
+	dataSource.setDriverClassName("org.postgresql.Driver");
+	dataSource.setUrl("jdbc:postgresql://localhost:5432/bd_contasapp");
+	dataSource.setUsername("postgres");
+	dataSource.setPassword("123");
+	
+	return dataSource;
+	}
+	
+	/*
+	 *  Adicionando a configuração para o UsuarioRepository
+	 */
+	
+	@Bean
+	public UsuarioRepository getRepository() {
+		//retornando uma instancia da classe UsuarioRepositoryy
+		// passando para o construtor da classe o data source
+		return new UsuarioRepository(getDataSource());
+	}
+	
+	/*
+	 * Adicionando a configuração para o ContaRepository
+	 */
+	@Bean
+	public ContaRepository getContaRepository() {
+		//retornando uma instancia da classe Contarepository
+		//passando para o construtor da classe o DAta source
+		return new ContaRepository(getDataSource());
+	}
 }
